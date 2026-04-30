@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="KonekQual - Cartographie de la qualite reseau au Cameroun">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 
     <title>{% block title %}KonekQual{% endblock %}</title>
 
@@ -54,6 +53,9 @@
                 <i class="bi bi-info-circle-fill"></i> A propos
             </a>
         </div>
+        <button onclick="toggleTheme()" id="theme-toggle" class="theme-btn" title="Changer le theme">
+            <i class="bi bi-circle-half" id="theme-icon"></i>
+        </button>
     </nav>
 
     <!-- Messages -->
@@ -61,7 +63,6 @@
     <div class="messages-container">
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">
-            <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'error' %}exclamation-triangle-fill{% elif message.tags == 'warning' %}exclamation-circle-fill{% else %}info-circle-fill{% endif %}"></i>
             {{ message }}
         </div>
         {% endfor %}
@@ -82,6 +83,36 @@
         function toggleMenu() {
             document.getElementById('navLinks').classList.toggle('active');
         }
+
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+            localStorage.setItem('theme', theme);
+            updateIcon(theme);
+        }
+
+        function updateIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (!icon) return;
+            if (theme === 'dark') icon.className = 'bi bi-moon-fill';
+            else if (theme === 'light') icon.className = 'bi bi-sun-fill';
+            else icon.className = 'bi bi-circle-half';
+        }
+
+        function toggleTheme() {
+            const current = localStorage.getItem('theme') || 'auto';
+            if (current === 'auto') setTheme('dark');
+            else if (current === 'dark') setTheme('light');
+            else setTheme('auto');
+        }
+
+        const saved = localStorage.getItem('theme') || 'auto';
+        setTheme(saved);
     </script>
 
     {% block extra_js %}{% endblock %}
