@@ -1,0 +1,94 @@
+{% extends 'collecte/base.html' %}
+{% block title %}Merci - KonekQual{% endblock %}
+
+{% block content %}
+<div class="merci-container">
+    <div class="merci-card">
+        <span class="merci-icon"><i class="bi bi-check-circle-fill text-success" style="font-size:4rem;"></i></span>
+        <h1>Merci, Veilleur !</h1>
+        <p>Votre signalement #{{ signalement.id }} a bien ete enregistre.</p>
+
+        <div class="merci-details">
+            <p><i class="bi bi-phone-fill"></i> <strong>{{ signalement.get_operateur_display }}</strong></p>
+            <p><i class="bi bi-geo-alt-fill"></i> {{ signalement.get_ville_display }} - {{ signalement.quartier }}</p>
+            <p><i class="bi bi-star-fill text-warning"></i> Score IQR : <strong>{{ signalement.score_composite }}/100</strong></p>
+            <p class="categorie">
+                {% if signalement.categorie_zone == "Zone d'Excellence" %}
+                    <i class="bi bi-circle-fill text-success"></i>
+                {% elif signalement.categorie_zone == "Zone Acceptable" %}
+                    <i class="bi bi-circle-fill text-info"></i>
+                {% elif signalement.categorie_zone == "Zone Perfectible" %}
+                    <i class="bi bi-circle-fill text-warning"></i>
+                {% else %}
+                    <i class="bi bi-circle-fill text-danger"></i>
+                {% endif %}
+                {{ signalement.categorie_zone }}
+            </p>
+        </div>
+
+        {% if badge_actuel %}
+        <div class="badge-section">
+            <h3><i class="bi bi-award-fill text-warning"></i> Votre grade</h3>
+            <div class="badge-card current">
+                <span class="badge-icon">
+                    {% if badge_actuel.seuil >= 50 %}
+                        <i class="bi bi-star-fill text-warning" style="font-size:2rem;"></i>
+                    {% elif badge_actuel.seuil >= 20 %}
+                        <i class="bi bi-trophy-fill text-warning" style="font-size:2rem;"></i>
+                    {% elif badge_actuel.seuil >= 10 %}
+                        <i class="bi bi-award-fill text-info" style="font-size:2rem;"></i>
+                    {% elif badge_actuel.seuil >= 5 %}
+                        <i class="bi bi-shield-fill text-primary" style="font-size:2rem;"></i>
+                    {% elif badge_actuel.seuil >= 3 %}
+                        <i class="bi bi-broadcast text-primary" style="font-size:2rem;"></i>
+                    {% else %}
+                        <i class="bi bi-person-fill text-primary" style="font-size:2rem;"></i>
+                    {% endif %}
+                </span>
+                <div>
+                    <strong>{{ badge_actuel.nom }}</strong>
+                    <p>{{ badge_actuel.description }}</p>
+                </div>
+            </div>
+            <p class="badge-count"><i class="bi bi-database-fill"></i> {{ nb_contributions }} signalement{{ nb_contributions|pluralize }} au total</p>
+        </div>
+        {% endif %}
+
+        {% if prochain_badge %}
+        <div class="badge-section next">
+            <h3><i class="bi bi-arrow-up-circle-fill text-info"></i> Prochain grade</h3>
+            <div class="badge-card">
+                <span class="badge-icon">
+                    {% if prochain_badge.seuil >= 50 %}
+                        <i class="bi bi-star-fill text-secondary" style="font-size:2rem;"></i>
+                    {% elif prochain_badge.seuil >= 20 %}
+                        <i class="bi bi-trophy-fill text-secondary" style="font-size:2rem;"></i>
+                    {% elif prochain_badge.seuil >= 10 %}
+                        <i class="bi bi-award-fill text-secondary" style="font-size:2rem;"></i>
+                    {% elif prochain_badge.seuil >= 5 %}
+                        <i class="bi bi-shield-fill text-secondary" style="font-size:2rem;"></i>
+                    {% elif prochain_badge.seuil >= 3 %}
+                        <i class="bi bi-broadcast text-secondary" style="font-size:2rem;"></i>
+                    {% else %}
+                        <i class="bi bi-person-fill text-secondary" style="font-size:2rem;"></i>
+                    {% endif %}
+                </span>
+                <div>
+                    <strong>{{ prochain_badge.nom }}</strong>
+                    <p>Encore {{ prochain_badge.restant }} signalement{{ prochain_badge.restant|pluralize }}</p>
+                    <div class="progress-bar-small">
+                        <div class="progress-fill-small" style="width: {% widthratio nb_contributions prochain_badge.seuil 100 %}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="merci-actions">
+            <a href="{% url 'signaler' %}" class="btn btn-primary"><i class="bi bi-plus-circle-fill"></i> Nouveau signalement</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary"><i class="bi bi-bar-chart-fill"></i> Voir les statistiques</a>
+            <a href="{% url 'accueil' %}" class="btn btn-ghost"><i class="bi bi-house-door-fill"></i> Retour a l'accueil</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

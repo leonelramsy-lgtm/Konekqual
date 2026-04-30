@@ -1,0 +1,204 @@
+{% extends 'collecte/base.html' %}
+{% block title %}Comparer - KonekQual{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-slack"></i> Comparateur d'operateurs</h1>
+    <p class="subtitle"><i class="bi bi-arrow-left-right"></i> Comparez deux operateurs cote a cote</p>
+</div>
+
+<!-- Sélecteurs -->
+<div class="section" style="text-align:center;">
+    <form method="GET" class="comparateur-form">
+        <div style="display:flex;gap:1rem;align-items:center;justify-content:center;flex-wrap:wrap;">
+            <select name="op1" class="form-select" style="width:auto;min-width:180px;">
+                {% for value, label in all_operateurs %}
+                <option value="{{ value }}" {% if operateur1 == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+
+            <span style="font-size:1.5rem;font-weight:bold;color:var(--primary);">VS</span>
+
+            <select name="op2" class="form-select" style="width:auto;min-width:180px;">
+                {% for value, label in all_operateurs %}
+                <option value="{{ value }}" {% if operateur2 == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Comparer</button>
+        </div>
+    </form>
+</div>
+
+{% if stats1 and stats2 %}
+<!-- Graphique radar -->
+{% if graph_json %}
+<div class="section" style="text-align:center;">
+    <div id="radar-chart"></div>
+</div>
+{% endif %}
+
+<!-- KPIs comparatifs -->
+<div class="kpi-grid">
+    <div class="kpi-card" style="border-left:4px solid #ff6600;">
+        <span class="kpi-icon"><i class="bi bi-phone-fill"></i></span>
+        <span class="kpi-value" style="color:#ff6600;">{{ stats1.moyenne }}/100</span>
+        <span class="kpi-label">{{ nom1 }}</span>
+        <small><i class="bi bi-database-fill"></i> {{ stats1.nb }} signalements</small>
+    </div>
+    <div class="kpi-card">
+        <span class="kpi-icon">
+            {% if stats1.moyenne > stats2.moyenne %}
+                <i class="bi bi-trophy-fill text-warning" style="font-size:2rem;"></i>
+            {% elif stats2.moyenne > stats1.moyenne %}
+                <i class="bi bi-trophy-fill text-warning" style="font-size:2rem;"></i>
+            {% else %}
+                <i class="bi bi-dash-circle-fill text-info" style="font-size:2rem;"></i>
+            {% endif %}
+        </span>
+        <span class="kpi-value">
+            {% if stats1.moyenne > stats2.moyenne %}
+                {{ nom1 }} gagne !
+            {% elif stats2.moyenne > stats1.moyenne %}
+                {{ nom2 }} gagne !
+            {% else %}
+                Égalité
+            {% endif %}
+        </span>
+        <span class="kpi-label">Vainqueur</span>
+    </div>
+    <div class="kpi-card" style="border-left:4px solid #0066cc;">
+        <span class="kpi-icon"><i class="bi bi-phone-fill"></i></span>
+        <span class="kpi-value" style="color:#0066cc;">{{ stats2.moyenne }}/100</span>
+        <span class="kpi-label">{{ nom2 }}</span>
+        <small><i class="bi bi-database-fill"></i> {{ stats2.nb }} signalements</small>
+    </div>
+</div>
+
+<!-- Tableau comparatif détaillé -->
+<div class="section">
+    <h2><i class="bi bi-table"></i> Comparaison détaillée</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><i class="bi bi-list-check"></i> Critère</th>
+                    <th style="color:#ff6600;">{{ nom1 }}</th>
+                    <th style="color:#0066cc;">{{ nom2 }}</th>
+                    <th><i class="bi bi-trophy-fill text-warning"></i> Vainqueur</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong><i class="bi bi-star-fill"></i> Score IQR</strong></td>
+                    <td>{{ stats1.moyenne }}/100</td>
+                    <td>{{ stats2.moyenne }}/100</td>
+                    <td><strong>{% if stats1.moyenne > stats2.moyenne %}{{ nom1 }}{% else %}{{ nom2 }}{% endif %}</strong></td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-telephone-fill"></i> Qualité appels</td>
+                    <td>{{ stats1.appel }}/5</td>
+                    <td>{{ stats2.appel }}/5</td>
+                    <td>{% if stats1.appel > stats2.appel %}{{ nom1 }}{% else %}{{ nom2 }}{% endif %}</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-speedometer2"></i> Débit internet</td>
+                    <td>{{ stats1.debit }}/5</td>
+                    <td>{{ stats2.debit }}/5</td>
+                    <td>{% if stats1.debit > stats2.debit %}{{ nom1 }}{% else %}{{ nom2 }}{% endif %}</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-link-45deg"></i> Stabilité</td>
+                    <td>{{ stats1.stabilite }}/5</td>
+                    <td>{{ stats2.stabilite }}/5</td>
+                    <td>{% if stats1.stabilite > stats2.stabilite %}{{ nom1 }}{% else %}{{ nom2 }}{% endif %}</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-broadcast"></i> Couverture</td>
+                    <td>{{ stats1.couverture }}/5</td>
+                    <td>{{ stats2.couverture }}/5</td>
+                    <td>{% if stats1.couverture > stats2.couverture %}{{ nom1 }}{% else %}{{ nom2 }}{% endif %}</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-building-fill"></i> Meilleure ville</td>
+                    <td>{{ stats1.meilleure_ville.ville }} ({{ stats1.meilleure_ville.m|floatformat:1 }})</td>
+                    <td>{{ stats2.meilleure_ville.ville }} ({{ stats2.meilleure_ville.m|floatformat:1 }})</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-building"></i> Pire ville</td>
+                    <td>{{ stats1.pire_ville.ville }} ({{ stats1.pire_ville.m|floatformat:1 }})</td>
+                    <td>{{ stats2.pire_ville.ville }} ({{ stats2.pire_ville.m|floatformat:1 }})</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-cash-coin"></i> Prix forfait moyen</td>
+                    <td>{% if stats1.prix_moyen %}{{ stats1.prix_moyen }} FCFA{% else %}-{% endif %}</td>
+                    <td>{% if stats2.prix_moyen %}{{ stats2.prix_moyen }} FCFA{% else %}-{% endif %}</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Répartition catégories -->
+<div class="charts-grid">
+    <div class="chart-box" style="text-align:center;">
+        <h3><i class="bi bi-phone-fill" style="color:#ff6600;"></i> {{ nom1 }} - Répartition</h3>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;padding:1rem;">
+            <div style="background:#e9ecef;border-radius:8px;overflow:hidden;display:flex;height:30px;">
+                <div style="background:#28a745;width:{% widthratio stats1.excellent stats1.nb 100 %}%;"></div>
+                <div style="background:#ffc107;width:{% widthratio stats1.acceptable stats1.nb 100 %}%;"></div>
+                <div style="background:#ff6600;width:{% widthratio stats1.perfectible stats1.nb 100 %}%;"></div>
+                <div style="background:#dc3545;width:{% widthratio stats1.critique stats1.nb 100 %}%;"></div>
+            </div>
+            <small>
+                <i class="bi bi-circle-fill text-success"></i> {{ stats1.excellent }} Excellence |
+                <i class="bi bi-circle-fill text-warning"></i> {{ stats1.acceptable }} Acceptable |
+                <i class="bi bi-circle-fill" style="color:#ff6600;"></i> {{ stats1.perfectible }} Perfectible |
+                <i class="bi bi-circle-fill text-danger"></i> {{ stats1.critique }} Critique
+            </small>
+        </div>
+    </div>
+    <div class="chart-box" style="text-align:center;">
+        <h3><i class="bi bi-phone-fill" style="color:#0066cc;"></i> {{ nom2 }} - Répartition</h3>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;padding:1rem;">
+            <div style="background:#e9ecef;border-radius:8px;overflow:hidden;display:flex;height:30px;">
+                <div style="background:#28a745;width:{% widthratio stats2.excellent stats2.nb 100 %}%;"></div>
+                <div style="background:#ffc107;width:{% widthratio stats2.acceptable stats2.nb 100 %}%;"></div>
+                <div style="background:#ff6600;width:{% widthratio stats2.perfectible stats2.nb 100 %}%;"></div>
+                <div style="background:#dc3545;width:{% widthratio stats2.critique stats2.nb 100 %}%;"></div>
+            </div>
+            <small>
+                <i class="bi bi-circle-fill text-success"></i> {{ stats2.excellent }} Excellence |
+                <i class="bi bi-circle-fill text-warning"></i> {{ stats2.acceptable }} Acceptable |
+                <i class="bi bi-circle-fill" style="color:#ff6600;"></i> {{ stats2.perfectible }} Perfectible |
+                <i class="bi bi-circle-fill text-danger"></i> {{ stats2.critique }} Critique
+            </small>
+        </div>
+    </div>
+</div>
+
+{% elif not stats1 %}
+<div class="section"><p><i class="bi bi-exclamation-circle-fill text-warning"></i> Aucun signalement pour {{ nom1 }}.</p></div>
+{% elif not stats2 %}
+<div class="section"><p><i class="bi bi-exclamation-circle-fill text-warning"></i> Aucun signalement pour {{ nom2 }}.</p></div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% if graph_json %}
+<script>
+    var graph = {{ graph_json|safe }};
+    Plotly.newPlot('radar-chart', graph.data, graph.layout, {
+        responsive: true, displayModeBar: false
+    });
+</script>
+{% endif %}
+{% endblock %}

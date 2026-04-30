@@ -1,0 +1,76 @@
+{% extends 'collecte/base.html' %}
+{% block title %}Heatmap - KonekQual{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-grid-3x3-gap-fill"></i> Heatmap de Qualite Reseau</h1>
+    <p class="subtitle"><i class="bi bi-diagram-3-fill"></i> Score IQR croise par ville et par operateur</p>
+</div>
+<div style="text-align:right;margin-bottom:1rem;">
+    <a href="{% url 'export_pdf_heatmap' %}" class="btn btn-secondary" style="font-size:0.85rem;">
+        <i class="bi bi-file-earmark-pdf-fill"></i> Exporter en PDF
+    </a>
+</div>
+{% if heatmap_json %}
+<div class="section">
+    <div id="heatmap-chart"></div>
+</div>
+{% endif %}
+
+<div class="section">
+    <h2><i class="bi bi-trophy-fill text-warning"></i> Meilleur operateur par ville</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><i class="bi bi-building"></i> Ville</th>
+                    <th><i class="bi bi-phone-fill"></i> Meilleur operateur</th>
+                    <th><i class="bi bi-star-fill"></i> Score IQR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in meilleurs_par_ville %}
+                <tr>
+                    <td>{{ m.ville }}</td>
+                    <td><strong>{{ m.operateur }}</strong></td>
+                    <td>
+                        <span style="color:{% if m.score >= 80 %}#28a745{% elif m.score >= 60 %}#17a2b8{% elif m.score >= 40 %}#ffc107{% else %}#dc3545{% endif %};font-weight:bold;">
+                            {{ m.score }}/100
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3">Aucune donnee.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="bi bi-question-circle-fill"></i> Comment lire la heatmap ?</h2>
+    <p>Chaque case represente le <strong>score IQR moyen</strong> pour un operateur dans une ville.</p>
+    <div class="legend">
+        <p><i class="bi bi-circle-fill text-success"></i> <strong>Vert</strong> = Excellent (80-100)</p>
+        <p><i class="bi bi-circle-fill text-info"></i> <strong>Cyan</strong> = Bon (60-80)</p>
+        <p><i class="bi bi-circle-fill text-warning"></i> <strong>Jaune</strong> = Moyen (40-60)</p>
+        <p><i class="bi bi-circle-fill text-danger"></i> <strong>Rouge</strong> = Critique (0-40)</p>
+    </div>
+    <p><small><i class="bi bi-info-circle-fill"></i> Les cases vides (N/A) signifient qu'aucun signalement n'a ete fait pour cette combinaison.</small></p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if heatmap_json %}
+<script>
+    var heatmapData = {{ heatmap_json|safe }};
+    Plotly.newPlot('heatmap-chart', heatmapData.data, heatmapData.layout, {
+        responsive: true, displayModeBar: false
+    });
+</script>
+{% endif %}
+{% endblock %}

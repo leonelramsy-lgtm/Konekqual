@@ -1,0 +1,215 @@
+{% extends 'collecte/base.html' %}
+{% block title %}Dashboard - KonekQual{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-speedometer2"></i> Centre de Commandement</h1>
+    <p class="subtitle">Analyse descriptive de la qualite reseau au Cameroun</p>
+    <div style="text-align:right;margin-bottom:1rem;display:flex;gap:0.5rem;justify-content:flex-end;flex-wrap:wrap;">
+        <a href="{% url 'export_csv' %}" class="btn btn-primary" style="font-size:0.85rem;"><i class="bi bi-download"></i> Exporter CSV</a>
+        <a href="{% url 'export_pdf_dashboard' %}" class="btn btn-secondary" style="font-size:0.85rem;"><i class="bi bi-file-earmark-pdf-fill"></i> Exporter PDF</a>
+    </div>
+</div>
+
+<!-- Filtres -->
+<div class="section" style="padding:1rem;">
+    <form method="GET" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:end;">
+        <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:0.8rem;">Ville</label>
+            <select name="ville" class="form-select" style="min-width:140px;">
+                <option value="">Toutes les villes</option>
+                {% for v in toutes_villes %}
+                <option value="{{ v.0 }}" {% if filtre_ville == v.0 %}selected{% endif %}>{{ v.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:0.8rem;">Operateur</label>
+            <select name="operateur" class="form-select" style="min-width:140px;">
+                <option value="">Tous les operateurs</option>
+                {% for o in tous_operateurs %}
+                <option value="{{ o.0 }}" {% if filtre_operateur == o.0 %}selected{% endif %}>{{ o.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:0.8rem;">Periode</label>
+            <select name="periode" class="form-select" style="min-width:120px;">
+                <option value="7" {% if filtre_periode == '7' %}selected{% endif %}>7 jours</option>
+                <option value="30" {% if filtre_periode == '30' %}selected{% endif %}>30 jours</option>
+                <option value="90" {% if filtre_periode == '90' %}selected{% endif %}>90 jours</option>
+                <option value="tout" {% if filtre_periode == 'tout' %}selected{% endif %}>Tout</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="padding:0.6rem 1.2rem;">🔍 Filtrer</button>
+        {% if filtre_ville or filtre_operateur or filtre_periode != '30' %}
+        <a href="{% url 'dashboard' %}" class="btn btn-ghost" style="padding:0.6rem 1.2rem;">✕ Reinitialiser</a>
+        {% endif %}
+    </form>
+    <small style="color:var(--text-light);margin-top:0.5rem;display:block;">{{ nb_filtre }} signalement(s) trouve(s)</small>
+</div>
+
+{% if graph4_json %}
+<div class="section" style="text-align:center;"><div id="gauge-chart"></div></div>
+{% endif %}
+
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <span class="kpi-icon">📡</span>
+        <span class="kpi-value">{{ stats_globales.nb_total|default:0 }}</span>
+        <span class="kpi-label">Signalements</span>
+    </div>
+    <div class="kpi-card">
+        <span class="kpi-icon">⭐</span>
+        <span class="kpi-value">{{ stats_globales.moyenne|default:"--" }}/100</span>
+        <span class="kpi-label">Score moyen</span>
+    </div>
+    <div class="kpi-card">
+        <span class="kpi-icon">🟢</span>
+        <span class="kpi-value">{{ zones_excellentes|default:0 }}</span>
+        <span class="kpi-label">Zones d'excellence</span>
+    </div>
+    <div class="kpi-card">
+        <span class="kpi-icon">🔴</span>
+        <span class="kpi-value">{{ zones_critiques|default:0 }}</span>
+        <span class="kpi-label">Zones critiques</span>
+    </div>
+</div>
+
+{% if graph5_json %}
+<div class="section"><div id="tendance-chart"></div></div>
+{% endif %}
+
+<div class="charts-grid">
+    {% if graph1_json %}<div class="chart-box"><div id="bar-chart"></div></div>{% endif %}
+    {% if graph2_json %}<div class="chart-box"><div id="pie-chart"></div></div>{% endif %}
+</div>
+
+{% if graph3_json %}
+<div class="section"><div id="ville-chart"></div></div>
+{% endif %}
+
+<div class="section">
+    <h2>📱 Classement par operateur</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>Rang</th><th>Operateur</th><th>Score moyen</th><th>Signalements</th></tr></thead>
+            <tbody>
+                {% for op in par_operateur %}
+                <tr>
+                    <td>{% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% else %}{{ forloop.counter }}{% endif %}</td>
+                    <td>{{ op.operateur }}</td>
+                    <td><div class="bar-container"><div class="bar" style="width:{{ op.moyenne }}%"></div><span>{{ op.moyenne|floatformat:1 }}/100</span></div></td>
+                    <td>{{ op.nombre }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">Aucun signalement.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="section">
+    <h2>🕐 Derniers signalements</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Operateur</th><th>Ville</th><th>Quartier</th>
+                    <th>Score</th><th>Categorie</th><th>👍👎</th><th>Date</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in derniers %}
+                <tr>
+                    <td>#{{ s.id }}</td>
+                    <td>{{ s.get_operateur_display }}</td>
+                    <td>{{ s.get_ville_display }}</td>
+                    <td>{{ s.quartier }}</td>
+                    <td>{{ s.score_composite }}/100</td>
+                    <td>{{ s.categorie_zone }}</td>
+                    <td style="white-space:nowrap;">
+                        <button onclick="voter({{ s.id }}, 'like')" class="btn-vote" title="Confirmer">👍 <span id="likes-{{ s.id }}">{{ s.likes|default:0 }}</span></button>
+                        <button onclick="voter({{ s.id }}, 'dislike')" class="btn-vote" title="Infirmer">👎 <span id="dislikes-{{ s.id }}">{{ s.dislikes|default:0 }}</span></button>
+                    </td>
+                    <td>{{ s.date_signalement|date:"d/m/Y H:i" }}</td>
+                    <td style="white-space:nowrap;">
+                        {% if user.is_staff %}
+                        <a href="{% url 'modifier' s.id %}" class="btn btn-ghost" style="font-size:0.7rem;padding:0.3rem 0.5rem;"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'supprimer' s.id %}" class="btn btn-ghost" style="font-size:0.7rem;padding:0.3rem 0.5rem;color:var(--danger);"><i class="bi bi-trash"></i></a>
+                        {% else %}
+                        <span style="font-size:0.7rem;color:var(--text-light);">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9">Aucun signalement. <a href="{% url 'signaler' %}">Soyez le premier !</a></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCSRFToken() {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        if (cookie.startsWith('csrftoken=')) {
+            return cookie.substring('csrftoken='.length);
+        }
+    }
+    return '';
+}
+
+function voter(id, type) {
+    var url = type === 'like' ? '/like/' + id + '/' : '/dislike/' + id + '/';
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        document.getElementById('likes-' + id).textContent = data.likes;
+        document.getElementById('dislikes-' + id).textContent = data.dislikes;
+    })
+    .catch(function(error) { console.error('Erreur:', error); });
+}
+
+// Graphiques Plotly
+{% if graph4_json %}
+var g4 = {{ graph4_json|safe }};
+Plotly.newPlot('gauge-chart', g4.data, g4.layout, {responsive: true, displayModeBar: false});
+{% endif %}
+
+{% if graph5_json %}
+var g5 = {{ graph5_json|safe }};
+Plotly.newPlot('tendance-chart', g5.data, g5.layout, {responsive: true, displayModeBar: false});
+{% endif %}
+
+{% if graph1_json %}
+var g1 = {{ graph1_json|safe }};
+Plotly.newPlot('bar-chart', g1.data, g1.layout, {responsive: true, displayModeBar: false});
+{% endif %}
+
+{% if graph2_json %}
+var g2 = {{ graph2_json|safe }};
+Plotly.newPlot('pie-chart', g2.data, g2.layout, {responsive: true, displayModeBar: false});
+{% endif %}
+
+{% if graph3_json %}
+var g3 = {{ graph3_json|safe }};
+Plotly.newPlot('ville-chart', g3.data, g3.layout, {responsive: true, displayModeBar: false});
+{% endif %}
+</script>
+{% endblock %}

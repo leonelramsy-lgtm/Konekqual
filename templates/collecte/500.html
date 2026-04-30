@@ -1,0 +1,11 @@
+{% extends 'collecte/base.html' %}
+{% block title %}Erreur serveur - KonekQual{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <h1>⚠️ Perturbation du Reseau - 500</h1>
+    <p>Notre Centre de Commandement rencontre une interference temporaire.</p>
+    <p>Nos Veilleurs techniques sont mobilises. Reessayez dans quelques instants.</p>
+    <a href="{% url 'accueil' %}" class="btn btn-primary">🏠 Retour a l'accueil</a>
+</div>
+{% endblock %}

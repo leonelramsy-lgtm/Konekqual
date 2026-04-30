@@ -1,0 +1,155 @@
+{% extends 'collecte/base.html' %}
+{% block title %}Analyse Descriptive - KonekQual{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-clipboard-data"></i> Analyse Descriptive</h1>
+    <p class="subtitle"><i class="bi bi-book"></i> Statistiques completes selon le cours EC2</p>
+</div>
+<div style="text-align:right;margin-bottom:1rem;">
+    <a href="{% url 'export_pdf_analyse' %}" class="btn btn-secondary" style="font-size:0.85rem;">
+        <i class="bi bi-file-earmark-pdf-fill"></i> PDF Analyse
+    </a>
+</div>
+
+{% if nb == 0 %}
+<div class="section"><p>Aucune donnée disponible. <a href="{% url 'signaler' %}">Ajoutez des signalements</a>.</p></div>
+{% else %}
+
+<!-- 1. STATISTIQUES DE BASE -->
+<div class="section">
+    <h2><i class="bi bi-calculator-fill"></i> 1. Statistiques de base</h2>
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <span class="kpi-icon"><i class="bi bi-people-fill"></i></span>
+            <span class="kpi-value">{{ nb }}</span>
+            <span class="kpi-label">Effectif (n)</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-icon"><i class="bi bi-graph-up"></i></span>
+            <span class="kpi-value">{{ stats_base.moyenne|floatformat:1 }}</span>
+            <span class="kpi-label">Moyenne (/100)</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-icon"><i class="bi bi-sliders"></i></span>
+            <span class="kpi-value">{{ mediane }}</span>
+            <span class="kpi-label">Médiane (/100)</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-icon"><i class="bi bi-arrow-left-right"></i></span>
+            <span class="kpi-value">{{ stats_base.ecart_type|floatformat:1 }}</span>
+            <span class="kpi-label">Écart-type</span>
+        </div>
+    </div>
+
+    <h3 style="margin-top:1.5rem;"><i class="bi bi-bullseye"></i> Indicateurs de position</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <tr><td><i class="bi bi-arrow-down-circle-fill text-danger"></i> Minimum</td><td><strong>{{ stats_base.min|floatformat:1 }}/100</strong></td></tr>
+            <tr><td><i class="bi bi-dash-circle-fill text-warning"></i> 1er Quartile (Q1)</td><td><strong>{{ q1 }}/100</strong></td></tr>
+            <tr><td><i class="bi bi-circle-half text-info"></i> Médiane (Q2)</td><td><strong>{{ mediane }}/100</strong></td></tr>
+            <tr><td><i class="bi bi-dash-circle-fill text-warning"></i> 3ème Quartile (Q3)</td><td><strong>{{ q3 }}/100</strong></td></tr>
+            <tr><td><i class="bi bi-arrow-up-circle-fill text-success"></i> Maximum</td><td><strong>{{ stats_base.max|floatformat:1 }}/100</strong></td></tr>
+            <tr><td><i class="bi bi-arrows-expand"></i> Écart interquartile (IQR)</td><td><strong>{{ iqr }}</strong></td></tr>
+            <tr><td><i class="bi bi-grid-3x3-gap-fill"></i> Variance</td><td><strong>{{ stats_base.variance|floatformat:1 }}</strong></td></tr>
+        </table>
+    </div>
+
+    <h3 style="margin-top:1.5rem;"><i class="bi bi-list-stars"></i> Moyennes par critère</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>Critère</th><th>Moyenne (/5)</th><th>Écart-type</th></tr></thead>
+            <tbody>
+                <tr><td><i class="bi bi-telephone-fill"></i> Qualité appels</td><td>{{ stats_base.moyenne_appel|floatformat:1 }}</td><td>{{ stats_base.ecart_appel|floatformat:1 }}</td></tr>
+                <tr><td><i class="bi bi-speedometer2"></i> Débit internet</td><td>{{ stats_base.moyenne_debit|floatformat:1 }}</td><td>{{ stats_base.ecart_debit|floatformat:1 }}</td></tr>
+                <tr><td><i class="bi bi-link-45deg"></i> Stabilité</td><td>{{ stats_base.moyenne_stabilite|floatformat:1 }}</td><td>{{ stats_base.ecart_stabilite|floatformat:1 }}</td></tr>
+                <tr><td><i class="bi bi-broadcast"></i> Couverture</td><td>{{ stats_base.moyenne_couverture|floatformat:1 }}</td><td>{{ stats_base.ecart_couverture|floatformat:1 }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- 2. DISTRIBUTION -->
+<div class="section">
+    <h2><i class="bi bi-bar-chart-steps"></i> 2. Distribution des variables</h2>
+
+    <div class="charts-grid">
+        <div class="chart-box"><div id="hist-chart"></div></div>
+        <div class="chart-box"><div id="box-chart"></div></div>
+    </div>
+
+    <h3><i class="bi bi-pie-chart-fill"></i> Répartition par catégorie</h3>
+    <div style="display:flex; gap:0.5rem; height:30px; border-radius:8px; overflow:hidden; margin-top:1rem;">
+        <div style="background:#28a745; width:{% widthratio distribution_categories.excellence nb 100 %}%;"></div>
+        <div style="background:#ffc107; width:{% widthratio distribution_categories.acceptable nb 100 %}%;"></div>
+        <div style="background:#ff6600; width:{% widthratio distribution_categories.perfectible nb 100 %}%;"></div>
+        <div style="background:#dc3545; width:{% widthratio distribution_categories.critique nb 100 %}%;"></div>
+    </div>
+    <small>
+        <i class="bi bi-circle-fill text-success"></i> {{ distribution_categories.excellence }} Excellence |
+        <i class="bi bi-circle-fill text-warning"></i> {{ distribution_categories.acceptable }} Acceptable |
+        <i class="bi bi-circle-fill" style="color:#ff6600;"></i> {{ distribution_categories.perfectible }} Perfectible |
+        <i class="bi bi-circle-fill text-danger"></i> {{ distribution_categories.critique }} Critique
+    </small>
+</div>
+
+<!-- 3. CORRÉLATIONS -->
+<div class="section">
+    <h2><i class="bi bi-diagram-3-fill"></i> 3. Corrélations entre indicateurs</h2>
+    <div class="chart-box" style="max-width:500px;margin:0 auto;">
+        <div id="corr-chart"></div>
+    </div>
+    <p><small><i class="bi bi-info-circle-fill"></i> La matrice de corrélation montre les liens entre les 4 critères. Une valeur proche de 1 indique une forte corrélation positive, proche de -1 une forte corrélation négative.</small></p>
+</div>
+<!-- 4. VALEURS ABERRANTES -->
+<div class="section">
+    <h2><i class="bi bi-exclamation-triangle-fill text-warning"></i> 4. Détection des valeurs aberrantes</h2>
+    <p><i class="bi bi-info-circle-fill"></i> Méthode : Écart interquartile (IQR). Bornes = [Q1 - 1.5×IQR, Q3 + 1.5×IQR]</p>
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <span class="kpi-icon"><i class="bi bi-arrow-down-circle-fill text-danger"></i></span>
+            <span class="kpi-value">{{ borne_basse }}/100</span>
+            <span class="kpi-label">Borne basse</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-icon"><i class="bi bi-arrow-up-circle-fill text-success"></i></span>
+            <span class="kpi-value">{{ borne_haute }}/100</span>
+            <span class="kpi-label">Borne haute</span>
+        </div>
+        <div class="kpi-card" style="border-left:4px solid #dc3545;">
+            <span class="kpi-icon"><i class="bi bi-flag-fill text-danger"></i></span>
+            <span class="kpi-value">{{ nb_aberrants }}</span>
+            <span class="kpi-label">Valeurs aberrantes</span>
+        </div>
+    </div>
+
+    {% if aberrants %}
+    <h3><i class="bi bi-list-ul"></i> Signalements aberrants détectés :</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th><i class="bi bi-hash"></i> ID</th><th><i class="bi bi-building"></i> Ville</th><th><i class="bi bi-phone"></i> Opérateur</th><th><i class="bi bi-star-fill"></i> Score</th><th><i class="bi bi-calendar"></i> Date</th></tr></thead>
+            <tbody>
+                {% for a in aberrants %}
+                <tr>
+                    <td>#{{ a.id }}</td><td>{{ a.get_ville_display }}</td>
+                    <td>{{ a.get_operateur_display }}</td>
+                    <td><strong>{{ a.score_composite }}/100</strong></td>
+                    <td>{{ a.date_signalement|date:"d/m/Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if hist_json %}<script>Plotly.newPlot('hist-chart', {{ hist_json|safe }}.data, {{ hist_json|safe }}.layout, {responsive:true,displayModeBar:false});</script>{% endif %}
+{% if box_json %}<script>Plotly.newPlot('box-chart', {{ box_json|safe }}.data, {{ box_json|safe }}.layout, {responsive:true,displayModeBar:false});</script>{% endif %}
+{% if corr_json %}<script>Plotly.newPlot('corr-chart', {{ corr_json|safe }}.data, {{ corr_json|safe }}.layout, {responsive:true,displayModeBar:false});</script>{% endif %}
+{% endblock %}

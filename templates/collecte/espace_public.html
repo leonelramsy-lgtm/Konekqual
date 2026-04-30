@@ -1,0 +1,150 @@
+{% extends 'collecte/base.html' %}
+{% block title %}KonekQual - Accueil{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1><i class="bi bi-broadcast heartbeat"></i> KonekQual</h1>
+    <p class="slogan">Votre experience reseau faconne la carte de la connectivite camerounaise</p>
+</div>
+
+<div class="stats-bar">
+    <div class="stat-item">
+        <span class="stat-number counter" data-target="{{ nb_total|default:0 }}">{{ nb_total|default:0 }}</span>
+        <span class="stat-label"><i class="bi bi-database-fill"></i> Signalements</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number counter" data-target="{{ nb_aujourdhui|default:0 }}">{{ nb_aujourdhui|default:0 }}</span>
+        <span class="stat-label"><i class="bi bi-calendar-check-fill"></i> Aujourd'hui</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">{{ moyenne|default:"--" }}/100</span>
+        <span class="stat-label"><i class="bi bi-star-fill"></i> Score moyen</span>
+    </div>
+</div>
+
+{% if zones_critiques_recentes %}
+<div class="section" style="border-left:4px solid #dc3545;">
+    <h3><i class="bi bi-exclamation-triangle-fill text-danger"></i> Zones en difficulte (dernieres 24h)</h3>
+    {% for z in zones_critiques_recentes %}
+    <p>
+        <i class="bi bi-circle-fill text-danger"></i> <strong>{{ z.get_operateur_display }}</strong> a
+        <strong>{{ z.quartier }}</strong> ({{ z.get_ville_display }}) —
+        Score : {{ z.score_composite }}/100
+        <small>({{ z.date_signalement|timesince }})</small>
+    </p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="info-section">
+    <h2><i class="bi bi-question-circle-fill"></i> Comment ca marche ?</h2>
+    <p class="section-subtitle">Trois etapes simples pour ameliorer la connectivite au Cameroun</p>
+
+    <div class="steps">
+        <div class="step">
+            <div class="step-icon"><i class="bi bi-pencil-square"></i></div>
+            <span class="step-number">1</span>
+            <h3>Signalez votre experience</h3>
+            <p>Remplissez un formulaire rapide : <strong>operateur, ville, qualite d'appel, debit, stabilite et couverture</strong>. 30 secondes suffisent !</p>
+            <ul class="step-details">
+                <li><i class="bi bi-phone-fill"></i> Choisissez votre operateur</li>
+                <li><i class="bi bi-geo-alt-fill"></i> Indiquez votre localisation</li>
+                <li><i class="bi bi-star-fill"></i> Notez la qualite du reseau</li>
+            </ul>
+        </div>
+
+        <div class="step-arrow">
+            <span class="arrow-icon"><i class="bi bi-arrow-right"></i></span>
+        </div>
+
+        <div class="step">
+            <div class="step-icon"><i class="bi bi-bar-chart-fill"></i></div>
+            <span class="step-number">2</span>
+            <h3>Consultez les analyses</h3>
+            <p>Visualisez les <strong>statistiques en temps reel</strong> : score moyen, classement des operateurs, carte interactive, heatmap et clustering K-Means.</p>
+            <ul class="step-details">
+                <li><i class="bi bi-graph-up-arrow"></i> Graphiques interactifs</li>
+                <li><i class="bi bi-map-fill"></i> Carte du Cameroun</li>
+                <li><i class="bi bi-robot"></i> Clustering automatique</li>
+            </ul>
+        </div>
+
+        <div class="step-arrow">
+            <span class="arrow-icon"><i class="bi bi-arrow-right"></i></span>
+        </div>
+
+        <div class="step">
+            <div class="step-icon"><i class="bi bi-people-fill"></i></div>
+            <span class="step-number">3</span>
+            <h3>Contribuez a la communaute</h3>
+            <p>Chaque signalement aide les Camerounais a <strong>choisir le meilleur reseau</strong>. Gagnez des badges et devenez un <strong>Gardien du Reseau</strong> !</p>
+            <ul class="step-details">
+                <li><i class="bi bi-trophy-fill"></i> Badges de contributeur</li>
+                <li><i class="bi bi-hand-thumbs-up-fill"></i> Votes de la communaute</li>
+                <li><i class="bi bi-bell-fill"></i> Alertes en temps reel</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="info-section">
+    <h2><i class="bi bi-bar-chart-line-fill"></i> En quelques chiffres</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-database-fill"></i></span>
+            <span class="feature-number counter" data-target="{{ nb_total|default:0 }}">{{ nb_total|default:0 }}</span>
+            <span class="feature-label">Signalements collectes</span>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-building-fill"></i></span>
+            <span class="feature-number">15+</span>
+            <span class="feature-label">Villes couvertes</span>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-phone-fill"></i></span>
+            <span class="feature-number">5</span>
+            <span class="feature-label">Operateurs suivis</span>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-robot"></i></span>
+            <span class="feature-number">3</span>
+            <span class="feature-label">Clusters K-Means</span>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <h2><i class="bi bi-rocket-takeoff-fill"></i> Pret a contribuer ?</h2>
+    <p>Rejoignez les Veilleurs qui cartographient le reseau camerounais</p>
+    <a href="{% url 'signaler' %}" class="btn btn-primary btn-large pulse">
+        <i class="bi bi-pencil-square"></i> Lancer mon premier signalement
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function animateCounters() {
+    document.querySelectorAll('.counter').forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const duration = 1500;
+        const step = target / (duration / 16);
+        let current = 0;
+
+        const updateCounter = () => {
+            current += step;
+            if (current < target) {
+                counter.textContent = Math.floor(current);
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target;
+            }
+        };
+
+        updateCounter();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', animateCounters);
+</script>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends 'collecte/base.html' %}
+{% block title %}Signaler - KonekQual{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-pencil-square"></i> Signaler la qualite de votre reseau</h1>
+    <p class="subtitle"><i class="bi bi-clock"></i> 30 secondes suffisent pour aider la communaute</p>
+</div>
+
+<form method="POST" class="form-signalement">
+    {% csrf_token %}
+
+    <fieldset class="form-section">
+        <legend><i class="bi bi-geo-alt-fill"></i> Ou etes-vous ?</legend>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="{{ form.ville.id_for_label }}">Ville <span class="required">*</span></label>
+                {{ form.ville }}
+                {% if form.ville.errors %}<small class="error-feedback">{{ form.ville.errors.0 }}</small>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.quartier.id_for_label }}">Quartier <span class="required">*</span></label>
+                {{ form.quartier }}
+                {% if form.quartier.errors %}<small class="error-feedback">{{ form.quartier.errors.0 }}</small>{% endif %}
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="form-section">
+        <legend><i class="bi bi-phone-fill"></i> Quel operateur ?</legend>
+        <div class="operateur-grid">
+            {% for value, label in form.operateur.field.choices %}
+            <label class="operateur-card">
+                <input type="radio" name="operateur" value="{{ value }}">
+                <span class="operateur-name">{{ label }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        {% if form.operateur.errors %}<small class="error-feedback">{{ form.operateur.errors.0 }}</small>{% endif %}
+    </fieldset>
+
+    <fieldset class="form-section">
+        <legend><i class="bi bi-wifi"></i> Type de reseau</legend>
+        <div class="form-group">
+            {{ form.type_reseau }}
+        </div>
+    </fieldset>
+
+    <fieldset class="form-section">
+        <legend><i class="bi bi-star-fill text-warning"></i> Qualite du reseau (1 = Tres mauvais, 5 = Excellent)</legend>
+        <div class="notes-grid">
+            <div class="form-group">
+                <label><i class="bi bi-telephone-fill"></i> Appels</label>
+                {{ form.qualite_appel }}
+            </div>
+            <div class="form-group">
+                <label><i class="bi bi-speedometer2"></i> Debit</label>
+                {{ form.debit_internet }}
+            </div>
+            <div class="form-group">
+                <label><i class="bi bi-link-45deg"></i> Stabilite</label>
+                {{ form.stabilite }}
+            </div>
+            <div class="form-group">
+                <label><i class="bi bi-broadcast"></i> Couverture</label>
+                {{ form.couverture }}
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="form-section">
+        <legend><i class="bi bi-clock-history"></i> Contexte</legend>
+        <div class="form-row">
+            <div class="form-group">
+                <label><i class="bi bi-sun-fill"></i> Moment de la journee</label>
+                <div class="radio-grid">
+                    {% for value, label in form.moment_journee.field.choices %}
+                    <label class="radio-label">
+                        <input type="radio" name="moment_journee" value="{{ value }}"
+                               {% if form.moment_journee.value == value %}checked{% endif %}>
+                        {{ label }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="bi bi-cloud-sun-fill"></i> Meteo</label>
+                <div class="radio-grid">
+                    {% for value, label in form.meteo.field.choices %}
+                    <label class="radio-label">
+                        <input type="radio" name="meteo" value="{{ value }}"
+                               {% if form.meteo.value == value %}checked{% endif %}>
+                        {{ label }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="form-section">
+        <legend><i class="bi bi-chat-left-text-fill"></i> Complement (optionnel)</legend>
+        <div class="form-group">
+            <label><i class="bi bi-cash-coin"></i> Prix du forfait (FCFA)</label>
+            {{ form.forfait_prix }}
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-pencil"></i> Commentaire</label>
+            {{ form.commentaire }}
+        </div>
+    </fieldset>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-large">
+            <i class="bi bi-send-fill"></i> Envoyer mon signalement
+        </button>
+    </div>
+   <fieldset class="form-section">
+    <legend><i class="bi bi-cpu"></i> Informations techniques (optionnel)</legend>
+    <div class="form-row">
+        <div class="form-group">
+            <label><i class="bi bi-reception-4"></i> Puissance du signal</label>
+            {{ form.puissance_signal }}
+            <small class="help-text">Ex: RSSI -85 dBm, RSRP -100 dBm, RSRQ -10 dB</small>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-phone"></i> Modèle du téléphone</label>
+            {{ form.modele_telephone }}
+            <small class="help-text">Ex: Samsung A14, iPhone 12, Redmi Note 13...</small>
+        </div>
+    </div>
+</fieldset>
+</form>
+{% endblock %}

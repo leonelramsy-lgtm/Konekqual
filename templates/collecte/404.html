@@ -1,0 +1,11 @@
+{% extends 'collecte/base.html' %}
+{% block title %}Page introuvable - KonekQual{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <h1>📡 Signal perdu - 404</h1>
+    <p>Cette page est en zone blanche...</p>
+    <p>Memes nos meilleurs Veilleurs ne la trouvent pas !</p>
+    <a href="{% url 'accueil' %}" class="btn btn-primary">🏠 Retour a l'accueil</a>
+</div>
+{% endblock %

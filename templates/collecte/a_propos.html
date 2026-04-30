@@ -1,0 +1,234 @@
+{% extends 'collecte/base.html' %}
+{% block title %}A propos - KonekQual{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-info-circle-fill"></i> A propos de KonekQual</h1>
+    <p class="subtitle">La plateforme collaborative de cartographie du reseau camerounais</p>
+</div>
+
+<!-- Mission -->
+<div class="section">
+    <h2><i class="bi bi-bullseye"></i> Notre mission</h2>
+    <p>KonekQual est ne d'un constat simple : <strong>chaque Camerounais a deja vecu la frustration d'un appel coupe ou d'une connexion internet instable</strong>.</p>
+    <p>Notre mission : <strong>cartographier la qualite reelle du reseau au Cameroun</strong>, kilometre par kilometre, grace a la force de la communaute.</p>
+    <p>Nous croyons que l'acces a une connexion de qualite est un droit fondamental a l'ere du numerique. En collectant et analysant les experiences de chaque utilisateur, nous permettons a tous de faire des choix eclaires.</p>
+</div>
+
+<!-- Valeurs -->
+<div class="section">
+    <h2><i class="bi bi-shield-check"></i> Nos valeurs</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-eye-fill"></i></span>
+            <h3>Transparence</h3>
+            <p>Toutes les donnees collectees sont accessibles a tous. Chaque signalement est visible et verifiable.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-people-fill"></i></span>
+            <h3>Communaute</h3>
+            <p>Chaque signalement compte. La force de KonekQual repose sur la participation citoyenne.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-shield-lock-fill"></i></span>
+            <h3>Independance</h3>
+            <p>Aucun operateur ne nous influence. Les donnees refletent la realite du terrain.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-graph-up-arrow"></i></span>
+            <h3>Innovation</h3>
+            <p>Nous utilisons l'intelligence artificielle pour analyser les donnees et fournir des recommandations.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Comment ça marche -->
+<div class="section">
+    <h2><i class="bi bi-gear-fill"></i> Comment ça marche ?</h2>
+
+    <div class="steps" style="margin-bottom:2rem;">
+        <div class="step">
+            <div class="step-icon"><i class="bi bi-pencil-square"></i></div>
+            <span class="step-number">1</span>
+            <h3>Collecte</h3>
+            <p>Les utilisateurs signalent la qualite de leur reseau via un formulaire simple : operateur, localisation, notes.</p>
+        </div>
+        <div class="step-arrow"><span class="arrow-icon"><i class="bi bi-arrow-right"></i></span></div>
+        <div class="step">
+            <div class="step-icon"><i class="bi bi-cpu-fill"></i></div>
+            <span class="step-number">2</span>
+            <h3>Traitement</h3>
+            <p>Notre algorithme calcule un Score IQR composite et classe automatiquement chaque zone.</p>
+        </div>
+        <div class="step-arrow"><span class="arrow-icon"><i class="bi bi-arrow-right"></i></span></div>
+        <div class="step">
+            <div class="step-icon"><i class="bi bi-bar-chart-fill"></i></div>
+            <span class="step-number">3</span>
+            <h3>Visualisation</h3>
+            <p>Les resultats sont presentes sur des graphiques interactifs, une carte et des tableaux comparatifs.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Score IQR -->
+<div class="section">
+    <h2><i class="bi bi-calculator-fill"></i> Le Score IQR (Indice de Qualite Reseau)</h2>
+    <p>Notre score est calcule a partir de <strong>4 criteres ponderes</strong>, notes de 1 a 5 :</p>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr><th>Critere</th><th>Poids</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><i class="bi bi-telephone-fill"></i> Qualite des appels</td><td>15%</td><td>Clarte des appels, absence de coupures</td></tr>
+                <tr><td><i class="bi bi-speedometer2"></i> Debit internet</td><td>35%</td><td>Vitesse de navigation et telechargement</td></tr>
+                <tr><td><i class="bi bi-link-45deg"></i> Stabilite</td><td>25%</td><td>Continuite de la connexion</td></tr>
+                <tr><td><i class="bi bi-broadcast"></i> Couverture</td><td>25%</td><td>Force du signal reseau</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p style="margin-top:1rem;">Le score final est ramene sur 100 et chaque zone est classee :</p>
+    <div class="legend" style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:0.5rem;">
+        <span><i class="bi bi-circle-fill text-success"></i> <strong>Excellence</strong> (80-100)</span>
+        <span><i class="bi bi-circle-fill text-info"></i> <strong>Acceptable</strong> (60-80)</span>
+        <span><i class="bi bi-circle-fill text-warning"></i> <strong>Perfectible</strong> (40-60)</span>
+        <span><i class="bi bi-circle-fill text-danger"></i> <strong>Critique</strong> (0-40)</span>
+    </div>
+</div>
+
+<!-- Technologies -->
+<div class="section">
+    <h2><i class="bi bi-code-slash"></i> Technologies utilisees</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-filetype-py"></i></span>
+            <h3>Django</h3>
+            <p>Framework web Python robuste et securise</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-graph-up"></i></span>
+            <h3>Plotly</h3>
+            <p>Graphiques interactifs et responsives</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-map-fill"></i></span>
+            <h3>Leaflet</h3>
+            <p>Carte interactive open source</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-robot"></i></span>
+            <h3>Scikit-learn</h3>
+            <p>Machine learning et clustering K-Means</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-database-fill"></i></span>
+            <h3>Pandas</h3>
+            <p>Analyse et manipulation de donnees</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-bar-chart-line-fill"></i></span>
+            <h3>NumPy</h3>
+            <p>Calculs statistiques avances</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-file-earmark-pdf-fill"></i></span>
+            <h3>ReportLab</h3>
+            <p>Generation de rapports PDF</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-sliders"></i></span>
+            <h3>Bootstrap Icons</h3>
+            <p>Icones vectorielles modernes</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-cpu-fill"></i></span>
+            <h3>Scipy</h3>
+            <p>Calculs scientifiques et regressions</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-server"></i></span>
+            <h3>Gunicorn</h3>
+            <p>Serveur de production WSGI</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-cloud-upload-fill"></i></span>
+            <h3>Railway</h3>
+            <p>Plateforme de deploiement cloud</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-shield-lock-fill"></i></span>
+            <h3>WhiteNoise</h3>
+            <p>Service de fichiers statiques en production</p>
+        </div>
+    </div>
+</div>
+<!-- Lien EC2 -->
+<div class="section">
+    <h2><i class="bi bi-lightbulb-fill"></i> Fonctionnalites analytiques</h2>
+    <p>KonekQual integre des techniques avancees d'analyse de donnees :</p>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr><th>Analyse</th><th>Application dans KonekQual</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Analyse de tendance</strong></td><td>Suivi de l'evolution du score reseau dans le temps</td></tr>
+                <tr><td><strong>Analyse multifactorielle</strong></td><td>Etude des facteurs qui influencent la qualite du reseau</td></tr>
+                <tr><td><strong>Indice composite</strong></td><td>Score IQR combinant 4 criteres en un seul indicateur</td></tr>
+                <tr><td><strong>Categorisation automatique</strong></td><td>Classement des zones en Excellence, Acceptable, Perfectible, Critique</td></tr>
+                <tr><td><strong>Regroupement automatique</strong></td><td>Detection de groupes de zones similaires par leurs caracteristiques</td></tr>
+                <tr><td><strong>Statistiques descriptives</strong></td><td>Moyennes, distributions, correlations, detection de valeurs aberrantes</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Contributeurs -->
+<div class="section">
+    <h2><i class="bi bi-trophy-fill text-warning"></i> Le systeme de badges</h2>
+    <p>Chaque contributeur progresse dans les grades suivants :</p>
+    <div class="features-grid">
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-person-fill"></i></span>
+            <h3>Nouveau Veilleur</h3>
+            <p>1 signalement</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-broadcast"></i></span>
+            <h3>Sentinelle</h3>
+            <p>3 signalements</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-shield-fill"></i></span>
+            <h3>Gardien du Reseau</h3>
+            <p>5 signalements</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-award-fill"></i></span>
+            <h3>Expert Connectivite</h3>
+            <p>10 signalements</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-trophy-fill"></i></span>
+            <h3>Maitre des Ondes</h3>
+            <p>20 signalements</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon"><i class="bi bi-star-fill"></i></span>
+            <h3>Legende du Reseau</h3>
+            <p>50 signalements</p>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+    <h2><i class="bi bi-heart-fill"></i> Rejoignez l'aventure !</h2>
+    <p>Chaque signalement nous rapproche d'une cartographie complete du reseau camerounais.<br>Ensemble, faisons du Cameroun un pays connecte !</p>
+    <a href="{% url 'signaler' %}" class="btn btn-primary btn-large pulse">
+        <i class="bi bi-pencil-square"></i> Contribuer maintenant
+    </a>
+</div>
+{% endblock %}
