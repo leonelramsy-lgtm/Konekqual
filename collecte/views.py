@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.db.models import Avg, Count, Max, Min
+from django.db.models import Avg, Count, Max, Min, StdDev
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from datetime import timedelta
@@ -697,9 +697,8 @@ def export_pdf_analyse(request):
                               ParagraphStyle('D', parent=styles['Normal'], fontSize=8, textColor=colors.grey,
                                              alignment=TA_CENTER, spaceAfter=1 * cm)))
 
-    stats = SignalementReseau.objects.aggregate(nb=Count('id'), moyenne=Avg('score_composite'),
-                                                ecart=StdDev('score_composite'), min=Min('score_composite'),
-                                                max=Max('score_composite'))
+    from django.db.models import StdDev
+stats = SignalementReseau.objects.aggregate(nb=Count('id'), moyenne=Avg('score_composite'), ecart=StdDev('score_composite'), min=Min('score_composite'), max=Max('score_composite'))
     elements.append(Paragraph("Statistiques descriptives", h2_style))
     data = [['Indicateur', 'Valeur'], ['Effectif', str(stats['nb'] or 0)],
             ['Moyenne', f"{stats['moyenne']:.1f}/100" if stats['moyenne'] else 'N/A'],
