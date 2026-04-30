@@ -684,44 +684,28 @@ def export_pdf_clustering(request):
 
 def export_pdf_analyse(request):
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=2 * cm, leftMargin=2 * cm, topMargin=2 * cm,
-                            bottomMargin=2 * cm)
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=2*cm, leftMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
-    titre_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor('#0052a3'),
-                                 spaceAfter=0.5 * cm, alignment=TA_CENTER)
-    h2_style = ParagraphStyle('H2', parent=styles['Heading2'], fontSize=13, textColor=colors.HexColor('#0052a3'),
-                              spaceBefore=0.5 * cm, spaceAfter=0.3 * cm)
+    titre_style = ParagraphStyle('T', parent=styles['Title'], fontSize=18, textColor=colors.HexColor('#0052a3'), spaceAfter=0.5*cm, alignment=TA_CENTER)
+    h2_style = ParagraphStyle('H2', parent=styles['Heading2'], fontSize=13, textColor=colors.HexColor('#0052a3'), spaceBefore=0.5*cm, spaceAfter=0.3*cm)
     elements = []
     elements.append(Paragraph("KonekQual - Analyse Descriptive", titre_style))
-    elements.append(Paragraph(f"Genere le {timezone.now().strftime('%d/%m/%Y a %H:%M')}",
-                              ParagraphStyle('D', parent=styles['Normal'], fontSize=8, textColor=colors.grey,
-                                             alignment=TA_CENTER, spaceAfter=1 * cm)))
-
+    elements.append(Paragraph(f"Genere le {timezone.now().strftime('%d/%m/%Y a %H:%M')}", ParagraphStyle('D', parent=styles['Normal'], fontSize=8, textColor=colors.grey, alignment=TA_CENTER, spaceAfter=1*cm)))
+    
     from django.db.models import StdDev
-stats = SignalementReseau.objects.aggregate(nb=Count('id'), moyenne=Avg('score_composite'), ecart=StdDev('score_composite'), min=Min('score_composite'), max=Max('score_composite'))
+    stats = SignalementReseau.objects.aggregate(nb=Count('id'), moyenne=Avg('score_composite'), ecart=StdDev('score_composite'), min=Min('score_composite'), max=Max('score_composite'))
     elements.append(Paragraph("Statistiques descriptives", h2_style))
-    data = [['Indicateur', 'Valeur'], ['Effectif', str(stats['nb'] or 0)],
-            ['Moyenne', f"{stats['moyenne']:.1f}/100" if stats['moyenne'] else 'N/A'],
-            ['Ecart-type', f"{stats['ecart']:.1f}" if stats['ecart'] else 'N/A'],
-            ['Minimum', f"{stats['min']:.1f}/100" if stats['min'] else 'N/A'],
-            ['Maximum', f"{stats['max']:.1f}/100" if stats['max'] else 'N/A']]
-    t = Table(data, colWidths=[8 * cm, 6 * cm])
-    t.setStyle(TableStyle(
-        [('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0052a3')), ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-         ('FONTSIZE', (0, 0), (-1, -1), 9), ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cccccc')),
-         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f5f7fa')]),
-         ('TOPPADDING', (0, 0), (-1, -1), 6), ('BOTTOMPADDING', (0, 0), (-1, -1), 6)]))
+    data = [['Indicateur','Valeur'],['Effectif',str(stats['nb'] or 0)],['Moyenne',f"{stats['moyenne']:.1f}/100" if stats['moyenne'] else 'N/A'],['Ecart-type',f"{stats['ecart']:.1f}" if stats['ecart'] else 'N/A'],['Minimum',f"{stats['min']:.1f}/100" if stats['min'] else 'N/A'],['Maximum',f"{stats['max']:.1f}/100" if stats['max'] else 'N/A']]
+    t = Table(data, colWidths=[8*cm,6*cm])
+    t.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.HexColor('#0052a3')),('TEXTCOLOR',(0,0),(-1,0),colors.white),('FONTSIZE',(0,0),(-1,-1),9),('GRID',(0,0),(-1,-1),0.5,colors.HexColor('#cccccc')),('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.white,colors.HexColor('#f5f7fa')]),('TOPPADDING',(0,0),(-1,-1),6),('BOTTOMPADDING',(0,0),(-1,-1),6)]))
     elements.append(t)
-    elements.append(Spacer(1, 1 * cm))
-    elements.append(Paragraph("KonekQual",
-                              ParagraphStyle('F', parent=styles['Normal'], fontSize=7, textColor=colors.grey,
-                                             alignment=TA_CENTER)))
+    elements.append(Spacer(1,1*cm))
+    elements.append(Paragraph("KonekQual", ParagraphStyle('F', parent=styles['Normal'], fontSize=7, textColor=colors.grey, alignment=TA_CENTER)))
     doc.build(elements)
     buffer.seek(0)
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="analyse.pdf"'
     return response
-
 
 def export_pdf_carte(request):
     buffer = BytesIO()
