@@ -1628,3 +1628,44 @@ html, body {
         font-size: 0.75rem !important;
     }
 }
+
+.theme-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+[data-theme="light"] {
+    --bg: #f0f2f5 !important;
+    --card-bg: #ffffff !important;
+    --text: #1a1a2e !important;
+    --text-light: #4a5568 !important;
+    --border: #d1d5db !important;
+}
+
+[data-theme="light"] body { background: #f0f2f5 !important; color: #1a1a2e !important; }
+[data-theme="light"] .navbar { background: #ffffff !important; }
+[data-theme="light"] .section { background: #ffffff !important; }
+[data-theme="light"] .card { background: #ffffff !important; }
+[data-theme="light"] .kpi-card { background: #ffffff !important; }
+[data-theme="light"] .form-section { background: #ffffff !important; }
+[data-theme="light"] .table { background: #ffffff !important; }
+[data-theme="light"] .table th { background: var(--primary) !important; color: white !important; }
+[data-theme="light"] .table td { color: #1a1a2e !important; }
+[data-theme="light"] .nav-links a { color: #1a1a2e !important; }
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-select,
+[data-theme="light"] .form-textarea,
+[data-theme="light"] .star-input { background: #ffffff !important; color: #1a1a2e !important; border-color: #d1d5db !important; }
+[data-theme="light"] .operateur-card { background: #ffffff !important; color: #1a1a2e !important; }
+[data-theme="light"] .radio-label { background: #ffffff !important; color: #1a1a2e !important; }
+[data-theme="light"] .stats-bar { background: #ffffff !important; }
+[data-theme="light"] .btn-ghost { color: #1a1a2e !important; border-color: #d1d5db !important; }
+
